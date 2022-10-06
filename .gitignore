@@ -1,0 +1,8 @@
+/build
+/dist
+/obs
+/Range Packages
+/__pycache__
+/images/*.svg
+bugs.txt
+*.spec

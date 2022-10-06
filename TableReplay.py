@@ -1,84 +1,70 @@
-# -*- coding: utf-8 -*-
 """
-TableReplay class for texas hold'em.
-
-Class displays 6-max table and 
-
-
+# TableReplay class for texas hold'em.
+# Class displays 6-max table, along with hole cards and betting chips
 """
 
 import tkinter as tk
 import os
+
 class TableReplay(tk.Canvas):
     
-    deck = {0: "2",
-             1: "3",
-             2: "4",
-             3: "5",
-             4: "6",
-             5: "7",
-             6: "8",
-             7: "9",
-             8: "T",
-             9: "J",
-             10: "Q",
-             11: "K",
-             12: "A"}
-    pos_str = ['BN','SB','BB','EP','MP','CO']
-    suits = {"c": "#00A318",
-             "s": "#000000",
-             "h": "#FF3333",
-             "d": "#0093FB"}
-             
+    pos_str = ('BN','SB','BB','EP','MP','CO')
+    suits = {'c': '#00A318', 's': '#000000', 'h': '#FF3333', 'd': '#0093FB'}
+    
     # coordinates for placing objects on table
-    chippos_x = [205,360,500,505,350,198]
-    chippos_y = [140,110,142,235,265,240]
-    btn_x = [155,315,575,559,415,179]
-    btn_y = [160,105,160,285,309,289]
-    labelpos_x = [162,447,629,634,343,161]
-    labelpos_y = [143,75,143,304,397,304]
+    chippos_x = (205,360,500,505,350,198)
+    chippos_y = (140,110,142,235,265,240)
+    btn_x = (155,315,575,559,415,179)
+    btn_y = (160,105,160,285,309,289)
+    labelpos_x = (162,447,629,634,343,161)
+    labelpos_y = (143,75,143,304,397,304)
         
-    def __init__(self, parent, heropos, vilpos, situation_index, herocards, **kwargs):
-        tk.Canvas.__init__(self, parent, width=765, height=440, bg="white", highlightbackground="white", highlightcolor="white", highlightthickness=0)
-        
+    def __init__(self, parent, heropos, vilpos, situation_index, herocards, theme, **kwargs):
+
+        tk.Canvas.__init__(self, parent, width=765, height=440, bg=theme.bgcolor, highlightbackground=theme.bgcolor, highlightcolor=theme.bgcolor, highlightthickness=0, bd=0)
+
         # defines the preflop situation/positions
         self.heropos = heropos
         self.vilpos = vilpos
         self.situation_index = situation_index
         self.herocards = herocards
         
-        # image locations
-        self.ptable = tk.PhotoImage(file = os.getcwd() + '\\Images\\handreplayer_table_med.png')
-        self.bn_marker = tk.PhotoImage(file = os.getcwd() + '\\Images\\bn_marker.png')
-        self.chips_sb = tk.PhotoImage(file = os.getcwd() + '\\Images\\chips_sb.png')
-        self.chips_bb = tk.PhotoImage(file = os.getcwd() + '\\Images\\chips_bb.png')
-        self.chips_2p5bb = tk.PhotoImage(file = os.getcwd() + '\\Images\\chips_2p5bb.png')
-        self.chips_8bb = tk.PhotoImage(file = os.getcwd() + '\\Images\\chips_8bb.png')
-        self.chips_22bb = tk.PhotoImage(file = os.getcwd() + '\\Images\\chips_22bb.png')
-        self.suit_h = tk.PhotoImage(file = os.getcwd() + '\\Images\\suit_h.png')
-        self.suit_d = tk.PhotoImage(file = os.getcwd() + '\\Images\\suit_d.png')
-        self.suit_c = tk.PhotoImage(file = os.getcwd() + '\\Images\\suit_c.png')
-        self.suit_s = tk.PhotoImage(file = os.getcwd() + '\\Images\\suit_s.png')
-        self.blank = tk.PhotoImage(file = os.getcwd() + '\\Images\\blank.png')
+        # define images
+        img_dir = f'{os.getcwd()}\\Images'
+        if theme.bgcolor == "#FFFFFF":
+            self.ptable = tk.PhotoImage(file = f'{img_dir}\\handreplayer_table_med_default.png')
+        else:
+            self.ptable = tk.PhotoImage(file = f'{img_dir}\\handreplayer_table_med_dark.png')
+        self.bn_marker = tk.PhotoImage(file = f'{img_dir}\\bn_marker.png')
+        self.chips_sb = tk.PhotoImage(file = f'{img_dir}\\chips_sb.png')
+        self.chips_bb = tk.PhotoImage(file = f'{img_dir}\\chips_bb.png')
+        self.chips_2p5bb = tk.PhotoImage(file = f'{img_dir}\\chips_2p5bb.png')
+        self.chips_8bb = tk.PhotoImage(file = f'{img_dir}\\chips_8bb.png')
+        self.chips_22bb = tk.PhotoImage(file = f'{img_dir}\\chips_22bb.png')
+        self.suit_h = tk.PhotoImage(file = f'{img_dir}\\suit_h.png')
+        self.suit_d = tk.PhotoImage(file = f'{img_dir}\\suit_d.png')
+        self.suit_c = tk.PhotoImage(file = f'{img_dir}\\suit_c.png')
+        self.suit_s = tk.PhotoImage(file = f'{img_dir}\\suit_s.png')
+        self.blank = tk.PhotoImage(file = f'{img_dir}\\blank.png')
         
         # draw table template
-        self.grid(row=0, column=0, sticky = 'w')
+        self.grid(row=0, column=0, sticky='w')
         self.create_image(10, 10, anchor='nw', image=self.ptable)
         
         # draw position labels
         heropos_idx = TableReplay.pos_str.index(self.heropos)
-        self.poslabels = [0,0,0,0,0,0]
-        for i in range(6):
-            strdraw_idx = (heropos_idx + 2 + i) % 6
-            self.poslabels[i] = self.create_text(TableReplay.labelpos_x[i], TableReplay.labelpos_y[i], text=TableReplay.pos_str[strdraw_idx], anchor='e', font=("Helvetica", 16, 'bold'), fill='white')
-        
+        self.poslabels = []
+        for i, pos in enumerate(TableReplay.pos_str):
+            strdraw_idx = (heropos_idx + 2 + i) % len(TableReplay.pos_str)
+            self.poslabels.append(self.create_text(TableReplay.labelpos_x[i], TableReplay.labelpos_y[i], text=TableReplay.pos_str[strdraw_idx], anchor='e', font=("Helvetica", 16, 'bold'), fill='white'))
+
         # post sb and bb and btn marker
-        strdraw_idx = (5 - heropos_idx) % 6
-        self.sb_img = self.create_image(TableReplay.chippos_x[strdraw_idx], TableReplay.chippos_y[strdraw_idx], anchor = 'nw', image=self.chips_sb)
-        strdraw_idx = (6 - heropos_idx) % 6
-        self.bb_img = self.create_image(TableReplay.chippos_x[strdraw_idx], TableReplay.chippos_y[strdraw_idx], anchor = 'nw', image=self.chips_bb)
-        strdraw_idx = (4 - heropos_idx) % 6
-        self.btn_img = self.create_image(TableReplay.btn_x[strdraw_idx], TableReplay.btn_y[strdraw_idx], anchor = 'nw', image=self.bn_marker)
+        strdraw_idx = (5 - heropos_idx) % len(TableReplay.pos_str)
+        self.sb_img = self.create_image(TableReplay.chippos_x[strdraw_idx], TableReplay.chippos_y[strdraw_idx], anchor='nw', image=self.chips_sb)
+        strdraw_idx = (6 - heropos_idx) % len(TableReplay.pos_str)
+        self.bb_img = self.create_image(TableReplay.chippos_x[strdraw_idx], TableReplay.chippos_y[strdraw_idx], anchor='nw', image=self.chips_bb)
+        strdraw_idx = (4 - heropos_idx) % len(TableReplay.pos_str)
+        self.btn_img = self.create_image(TableReplay.btn_x[strdraw_idx], TableReplay.btn_y[strdraw_idx], anchor='nw', image=self.bn_marker)
         
         self.itemconfigure(self.sb_img, state='hidden')
         self.itemconfigure(self.bb_img, state='hidden')
@@ -86,9 +72,7 @@ class TableReplay(tk.Canvas):
         
         # place bet amounts depending on preflop situation
         vilpos_idx = TableReplay.pos_str.index(self.vilpos)
-        if self.situation_index == 0:
-            pass
-        elif self.situation_index == 1:
+        if self.situation_index == 1:
             strdraw_idx = (vilpos_idx + 4 - heropos_idx) % 6
             self.vilchips_img = self.create_image(TableReplay.chippos_x[strdraw_idx], TableReplay.chippos_y[strdraw_idx], anchor = 'nw', image=self.chips_2p5bb)
         elif self.situation_index == 2:

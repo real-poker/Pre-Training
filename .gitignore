@@ -3,6 +3,6 @@
 /obs
 /Range Packages
 /__pycache__
-/images/*.svg
+*.svg
 bugs.txt
 *.spec
